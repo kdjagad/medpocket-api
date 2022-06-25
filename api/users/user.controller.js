@@ -5,7 +5,6 @@ const { getUserByPhone, create } = require('./user.service');
 module.exports = {
     login: (req, res) => {
         const body = req.body;
-        console.log("body", body)
         getUserByPhone(body, async (error, response, fields) => {
             if (error) {
                 res.status(500).json({ status: 0, message: error });
@@ -27,7 +26,6 @@ module.exports = {
     },
     register: (req, res) => {
         const body = req.body;
-        console.log("body", body)
         create(body, async (error, response, fields) => {
             if (error) {
                 res.status(500).json({ status: 0, message: error });
@@ -50,7 +48,6 @@ module.exports = {
     },
     verify: async (req, res) => {
         const body = req.body;
-        console.log("body", body)
         try {
 
             request(`http://msgclub.softhubinc.com/rest/otpservice/verify-otp?AUTH_KEY=${process.env.AUTH_KEY}&mobileNumber=${body.phone}&otp=${body.otp}`, function (error, response, reqBody) {

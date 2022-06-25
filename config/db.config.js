@@ -10,7 +10,6 @@ const dbCon = mysql.createConnection({
 
 dbCon.connect(function (error) {
     if (error) throw error;
-    console.log('Connection succesfully');
 });
 
 module.exports = dbCon;
