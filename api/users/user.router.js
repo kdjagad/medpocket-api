@@ -1,32 +1,60 @@
-const { login, register, verify, getProfile, updateProfile } = require('./user.controller');
-const jwt = require('jsonwebtoken');
+const {
+  login,
+  register,
+  verify,
+  getProfile,
+  updateProfile,
+  getCenters,
+  getCenterAds,
+  addStockiest,
+  addProducts,
+} = require("./user.controller");
+const { verifyToken } = require("../../config/hooks");
 
-function verifyToken(req, res, next) {
-    const authHeader = req.headers['authorization']
-    const token = authHeader && authHeader.split(' ')[1]
-
-    if (token == null) return res.sendStatus(401)
-
-    jwt.verify(token, process.env.JWT_SECRET, (err, user) => {
-        console.log(err)
-
-        if (err) return res.sendStatus(403)
-
-        req.user = user
-
-        next()
-    })
-}
-
-const router = require('express').Router();
-
-router.get('/', verifyToken, (req, res) => {
-    res.status(200).json({ "status": 1, "message": 'user fetched 123' });
+const router = require("express").Router();
+const multer = require("multer");
+const multerStorageStockiest = multer.diskStorage({
+  destination: (req, file, cb) => {
+    cb(null, "uploads/stockiests");
+  },
+  filename: (req, file, cb) => {
+    const ext = file.originalname.split(".").slice(-1);
+    cb(null, `${file.fieldname}-${Date.now()}.${ext}`);
+  },
 });
-router.post('/login', login);
-router.post('/register', register);
-router.post('/verify', verify);
-router.get('/profile', verifyToken, getProfile);
-router.post('/profile', verifyToken, updateProfile);
+const uploadStockiest = multer({ storage: multerStorageStockiest });
+const multerStorageProduct = multer.diskStorage({
+  destination: (req, file, cb) => {
+    cb(null, "uploads/products");
+  },
+  filename: (req, file, cb) => {
+    const ext = file.originalname.split(".").slice(-1);
+    cb(null, `${file.fieldname}-${Date.now()}.${ext}`);
+  },
+});
+const uploadProduct = multer({ storage: multerStorageProduct });
+
+router.get("/", verifyToken, (req, res) => {
+  res.status(200).json({ status: 1, message: "user fetched 123" });
+});
+router.post("/login", login);
+router.post("/register", register);
+router.post("/verify", verify);
+router.get("/centers", getCenters);
+router.get("/center/ads", verifyToken, getCenterAds);
+router.get("/profile", verifyToken, getProfile);
+router.post("/profile", verifyToken, updateProfile);
+router.post(
+  "/stockiest",
+  verifyToken,
+  uploadStockiest.single("attachment"),
+  addStockiest
+);
+router.post(
+  "/product",
+  verifyToken,
+  uploadProduct.single("attachment"),
+  addProducts
+);
 
 module.exports = router;
