@@ -28,6 +28,6 @@ app.use("/api/v1/chemist-drugist", chemistDrugistRouter);
 app.use("/api/v1/order", orderRouter);
 app.use("/api/v1/news", newsRouter);
 
-app.listen(port, () => {
+app.listen(port, "0.0.0.0", () => {
   console.log("app started on port " + port);
 });
