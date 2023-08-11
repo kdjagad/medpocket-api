@@ -19,6 +19,7 @@ const productRouter = require("./api/products/product.router");
 const chemistDrugistRouter = require("./api/chemist_drugist/chemistDrugist.router");
 const orderRouter = require("./api/orders/order.router");
 const newsRouter = require("./api/news/news.router");
+const licencesRouter = require("./api/key_generator/keyGenerator.router");
 app.use("/api/v1/users", usersRouter);
 app.use("/api/v1/brands", brandsRouter);
 app.use("/api/v1/company", companyRouter);
@@ -27,6 +28,7 @@ app.use("/api/v1/product", productRouter);
 app.use("/api/v1/chemist-drugist", chemistDrugistRouter);
 app.use("/api/v1/order", orderRouter);
 app.use("/api/v1/news", newsRouter);
+app.use("/api/v1/licences", licencesRouter);
 
 app.listen(port, "0.0.0.0", () => {
   console.log("app started on port " + port);

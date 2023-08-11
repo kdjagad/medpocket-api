@@ -3,8 +3,8 @@ const db = require("../../config/db.config");
 module.exports = {
   searchBrand: (query, callback) => {
     db.query(
-      `select * from brands where (Name LIKE CONCAT(?, '%') OR  ID LIKE CONCAT(?, '%') OR  Packing LIKE CONCAT(?, '%') OR  Company_id LIKE CONCAT(?, '%'))`,
-      [query, query, query, query],
+      `select p.*,b.* from products p left outer join brands b on b.name=p.brand where (p.brand LIKE CONCAT(?, '%')) group by p.brand`,
+      [query],
       (error, results, fields) => {
         if (error) {
           callback(error);
@@ -13,10 +13,10 @@ module.exports = {
       }
     );
   },
-  searchBrandByCompany: (company_id, callback) => {
+  searchBrandByCompany: (company, callback) => {
     db.query(
-      `select * from brands where Company_id=?`,
-      [company_id],
+      `select p.*,b.* from products p left outer join brands b on b.name=p.brand where (p.COMPANY LIKE CONCAT(?, '%')) group by p.brand`,
+      [company],
       (error, results, fields) => {
         if (error) {
           callback(error);

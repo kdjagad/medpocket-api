@@ -1,14 +1,30 @@
 const db = require("../../config/db.config");
 
+// const groupBy = (items, key, findKey) => {
+//   const filtered = items.filter(
+//     (arr, index, self) =>
+//       index === self.findIndex((t) => t[findKey] === arr[findKey])
+//   );
+//   const arr = [];
+//   filtered.map((ft) => {
+//     arr.push({
+//       ...ft,
+//       [key]: items.filter((dt) => dt[findKey] == ft[findKey]),
+//     });
+//   });
+//   return arr;
+// };
+
 module.exports = {
   searchCompany: (query, callback) => {
     db.query(
-      `select * from company where (Name LIKE CONCAT(?, '%'))`,
-      [query],
+      `select p.*,c.id as company_id from products p left outer join company c on c.name=p.company where (p.company LIKE CONCAT('%',?, '%')) OR (p.com_full LIKE CONCAT('%',?, '%')) group by p.com_full`,
+      [query, query],
       (error, results, fields) => {
         if (error) {
           callback(error);
         }
+        // results = groupBy(results, "BRANDS", "COM_FULL");
         return callback(null, results || null);
       }
     );
