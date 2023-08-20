@@ -6,6 +6,7 @@ const {
   addToCart,
   getCart,
   deleteCart,
+  getProductContent,
 } = require("./product.controller");
 
 const router = require("express").Router();
@@ -15,5 +16,6 @@ router.get("/cart", verifyToken, getCart);
 router.delete("/cart/:cartId", verifyToken, deleteCart);
 router.post("/cart", verifyToken, addToCart);
 router.get("/:productId", verifyToken, getProductById);
+router.get("/content/:content", verifyToken, getProductContent);
 
 module.exports = router;

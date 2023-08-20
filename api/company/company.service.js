@@ -18,8 +18,8 @@ const db = require("../../config/db.config");
 module.exports = {
   searchCompany: (query, callback) => {
     db.query(
-      `select p.*,c.id as company_id from products p left outer join company c on c.name=p.company where (p.company LIKE CONCAT('%',?, '%')) OR (p.com_full LIKE CONCAT('%',?, '%')) group by p.com_full`,
-      [query, query],
+      `select * from products where (COM_FULL LIKE CONCAT('%',?,'%')) group by COM_FULL`,
+      [query],
       (error, results, fields) => {
         if (error) {
           callback(error);
@@ -30,9 +30,9 @@ module.exports = {
     );
   },
   searchCompanyToStockiest: (query, user, isSearch, callback) => {
-    var queryString = `select c.*,s.* from crossreference c left outer join stockiests s ON (s.firm_name LIKE CONCAT(SUBSTRING_INDEX(c.FIRM_NAME,'-',1),'%')) where (c.COMPANY_NAME LIKE CONCAT(?,'%')) and c.CENTER=?`;
+    var queryString = `select c.*,s.* from crossreference c inner join stockiests s ON (s.firm_name LIKE CONCAT(SUBSTRING_INDEX(c.FIRM_NAME,'-',1),'%')) where (c.COMPANY_NAME LIKE CONCAT(?,'%')) and c.CENTER=?`;
     if (!isSearch) {
-      queryString = `select c.*,s.* from crossreference c left outer join stockiests s ON (s.firm_name LIKE CONCAT(SUBSTRING_INDEX(c.FIRM_NAME,'-',1),'%')) where c.COMPANY_NAME=? and c.CENTER=?`;
+      queryString = `select c.*,s.* from crossreference c inner join stockiests s ON (s.firm_name LIKE CONCAT(SUBSTRING_INDEX(c.FIRM_NAME,'-',1),'%')) where c.COMPANY_NAME=? and c.CENTER=?`;
     }
     db.query(queryString, [query, user.city], (error, results, fields) => {
       if (error) {
@@ -47,9 +47,9 @@ module.exports = {
     });
   },
   searchStockiestToCompany: (query, user, isSearch, callback) => {
-    var queryString = `select c.*,s.* from crossreference c left outer join stockiests s ON (s.firm_name LIKE CONCAT(SUBSTRING_INDEX(c.FIRM_NAME,'-',1),'%')) where (c.FIRM_NAME LIKE CONCAT(?,'%')) and c.CENTER=?`;
+    var queryString = `select c.*,s.* from crossreference c inner join stockiests s ON (s.firm_name LIKE CONCAT(SUBSTRING_INDEX(c.FIRM_NAME,'-',1),'%')) where (c.FIRM_NAME LIKE CONCAT(?,'%')) and c.CENTER=?`;
     if (!isSearch) {
-      queryString = `select c.*,s.* from crossreference c left outer join stockiests s ON (s.firm_name LIKE CONCAT(SUBSTRING_INDEX(c.FIRM_NAME,'-',1),'%')) where c.FIRM_NAME=? and c.CENTER=?`;
+      queryString = `select c.*,s.* from crossreference c inner join stockiests s ON (s.firm_name LIKE CONCAT(SUBSTRING_INDEX(c.FIRM_NAME,'-',1),'%')) where c.FIRM_NAME=? and c.CENTER=?`;
     }
     db.query(queryString, [query, user.city], (error, results, fields) => {
       if (error) {

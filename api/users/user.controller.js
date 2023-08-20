@@ -10,6 +10,8 @@ const {
   getCenterAds,
   addStockiest,
   addProducts,
+  checkKey,
+  updateKey,
 } = require("./user.service");
 
 module.exports = {
@@ -226,12 +228,53 @@ module.exports = {
   addProducts: async (req, res) => {
     const file = req.file;
     try {
-      debugger;
       addProducts(req.user, file.path, async (error) => {
         if (error) {
           res.status(200).json({ status: 0, message: "fail", data: null });
         } else {
           res.status(200).json({ status: 1, message: "success", data: null });
+        }
+      });
+    } catch (error) {
+      res.status(500).json({ status: 0, message: error });
+    }
+  },
+  validateKey: async (req, res) => {
+    const { reg_key = "" } = req.params;
+    try {
+      checkKey(reg_key, async (isValid) => {
+        if (isValid) {
+          updateUserById(
+            { reg_key: reg_key },
+            req.user.id,
+            async (error, response) => {
+              if (!error) {
+                updateKey(reg_key, async (error) => {
+                  if (error) {
+                    res
+                      .status(200)
+                      .json({
+                        status: 0,
+                        message: "Key not registered",
+                        data: null,
+                      });
+                  } else {
+                    res
+                      .status(200)
+                      .json({
+                        status: 1,
+                        message: "Key registered successfully",
+                        data: null,
+                      });
+                  }
+                });
+              }
+            }
+          );
+        } else {
+          res
+            .status(500)
+            .json({ status: 0, message: "Key is invalid or already used." });
         }
       });
     } catch (error) {

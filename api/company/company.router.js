@@ -8,7 +8,7 @@ const {
 } = require("./company.controller");
 
 const router = require("express").Router();
-router.post("/search", verifyToken, searchCompany);
+router.get("/search/:query", verifyToken, searchCompany);
 router.get("/to-stockiest/:query", verifyToken, searchCompanyToStockiest);
 router.get(
   "/to-stockiest/search/:company",

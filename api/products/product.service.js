@@ -37,6 +37,18 @@ module.exports = {
       }
     );
   },
+  getProductContent: (content, callback) => {
+    db.query(
+      `select * from generic where generic=?`,
+      [content],
+      (error, results, fields) => {
+        if (error) {
+          callback(error);
+        }
+        return callback(null, results.length ? results[0] : null);
+      }
+    );
+  },
 
   addToCart: (body, user, callback) => {
     db.query(

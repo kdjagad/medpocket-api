@@ -23,7 +23,7 @@ const groupAndAdd = (arr, column) => {
 module.exports = {
   searchCompany: async (req, res) => {
     try {
-      searchCompany(req.body.query, async (error, response) => {
+      searchCompany(req.params.query, async (error, response) => {
         response = response ? JSON.parse(JSON.stringify(response)) : null;
         if (response) {
           res

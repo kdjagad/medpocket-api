@@ -94,4 +94,41 @@ module.exports = {
       }
     );
   },
+
+  checkKey: (key, callback) => {
+    db.query(
+      `select * from valid_keys where reg_key=? and is_used=0`,
+      [key],
+      (error, results, fields) => {
+        if (error) {
+          return callback(false);
+        }
+        return callback(results.length > 0 ? true : false);
+      }
+    );
+  },
+  checkKey: (key, callback) => {
+    db.query(
+      `select * from valid_keys where reg_key=? and is_used=0`,
+      [key],
+      (error, results, fields) => {
+        if (error) {
+          return callback(false);
+        }
+        return callback(results.length > 0 ? true : false);
+      }
+    );
+  },
+  updateKey: (key, callback) => {
+    db.query(
+      `update valid_keys set is_used=1 where reg_key=?`,
+      [key],
+      (error, results, fields) => {
+        if (error) {
+          callback(error);
+        }
+        return callback(null, results);
+      }
+    );
+  },
 };

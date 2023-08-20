@@ -27,7 +27,7 @@ module.exports = {
   },
   searchBrandByGeneric: (generic, callback) => {
     db.query(
-      `select * from brands where Generic=?`,
+      `select * from brands b left outer join products p on b.Name=p.BRAND where b.Generic LIKE CONCAT('%',?, '%')`,
       [generic],
       (error, results, fields) => {
         if (error) {

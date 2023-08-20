@@ -8,6 +8,7 @@ const {
   getCenterAds,
   addStockiest,
   addProducts,
+  validateKey,
 } = require("./user.controller");
 const { verifyToken } = require("../../config/hooks");
 
@@ -43,6 +44,7 @@ router.post("/verify", verify);
 router.get("/centers", getCenters);
 router.get("/center/ads", verifyToken, getCenterAds);
 router.get("/profile", verifyToken, getProfile);
+router.get("/validate-key/:reg_key", verifyToken, validateKey);
 router.post("/profile", verifyToken, updateProfile);
 router.post(
   "/stockiest",
