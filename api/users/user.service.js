@@ -131,4 +131,16 @@ module.exports = {
       }
     );
   },
+  getOption: (key, callback) => {
+    db.query(
+      `select * from app_settings where key_name=?`,
+      [key],
+      (error, results, fields) => {
+        if (error) {
+          callback(error);
+        }
+        return callback(null, results);
+      }
+    );
+  },
 };
