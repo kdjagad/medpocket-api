@@ -14,7 +14,6 @@ module.exports = {
     );
   },
   generateLicences: (params, user, callback) => {
-    debugger;
     const licenseGen = require("@mcnaveen/license-gen");
     const { count = 0 } = params;
     const errors = [];
