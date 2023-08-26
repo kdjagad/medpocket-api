@@ -4,7 +4,7 @@ module.exports = {
   getNews: (user, callback) => {
     db.query(
       `select * from news where CENTER=?`,
-      [user?.city],
+      [user.city],
       (error, results, fields) => {
         if (error) {
           callback(error);

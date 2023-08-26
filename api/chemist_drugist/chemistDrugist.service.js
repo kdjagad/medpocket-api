@@ -4,7 +4,7 @@ module.exports = {
   searchChemistDrugist: (query, user, callback) => {
     db.query(
       `select * from chemistsdruggiest where (firm_name LIKE CONCAT(?, '%')) and CENTER=?`,
-      [query, user?.city],
+      [query, user.city],
       (error, results, fields) => {
         if (error) {
           callback(error);

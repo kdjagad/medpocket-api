@@ -48,7 +48,7 @@ module.exports = {
   getCenterAds: (user, callback) => {
     db.query(
       `select ca.* from center_ads ca left outer join centers c on c.ID=ca.center_id where c.center=? `,
-      [user?.city],
+      [user.city],
       (error, results, fields) => {
         if (error) {
           callback(error);
