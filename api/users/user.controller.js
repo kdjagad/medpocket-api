@@ -52,7 +52,7 @@ module.exports = {
         } else {
           res.status(500).json({
             status: 0,
-            message: "user not found",
+            message: "User not found or deactivated please contact admin",
             data: null,
             token: null,
           });
