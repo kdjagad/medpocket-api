@@ -43,6 +43,18 @@ module.exports = {
       }
     );
   },
+  getReceivedOrders: (user, callback) => {
+    db.query(
+      `select o.*,osm.Desc as txtStatus from order_master o left outer join order_status_master osm on o.status=osm.id where o.user_id=?`,
+      [user.id],
+      (error, results, fields) => {
+        if (error) {
+          callback(error);
+        }
+        return callback(null, results || null);
+      }
+    );
+  },
   getOrderById: (orderId, callback) => {
     db.query(
       `select o.*,p.*,s.*,s.id as stockiest_id from order_details o left outer join products p on p.ID=o.product_id left outer join stockiests s on s.id=o.stockiest_id where o.order_id=?`,

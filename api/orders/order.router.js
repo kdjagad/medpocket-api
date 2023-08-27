@@ -8,6 +8,7 @@ const {
 const router = require("express").Router();
 router.get("/generate", verifyToken, generateOrder);
 router.get("/", verifyToken, getOrders);
+router.get("/receive", verifyToken, getOrders);
 router.get("/:orderId", verifyToken, getOrderById);
 
 module.exports = router;
