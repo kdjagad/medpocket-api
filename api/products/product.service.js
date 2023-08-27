@@ -65,7 +65,7 @@ module.exports = {
   getCart: (user, callback) => {
     // debugger;
     db.query(
-      `select c.*,p.*,s.*,s.id as stockiest_id,c.id as cart_id from cart c left outer join products p on p.ID=c.product_id left outer join stockiests s on s.id=c.stockiest_id where c.user_id=?`,
+      `select c.*,p.*,c.id as cart_id from cart c left outer join products p on p.ID=c.product_id where c.user_id=?`,
       [user.id],
       (error, results, fields) => {
         if (error) {
