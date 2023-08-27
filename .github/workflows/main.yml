@@ -14,4 +14,4 @@ jobs:
         server: 103.180.120.216
         username: Dev-MedPocket
         password: ${{ secrets.ftp_password }}
-        server-dir: stage-api.medpocket.in/
+        server-dir: prod-api.medpocket.in/
