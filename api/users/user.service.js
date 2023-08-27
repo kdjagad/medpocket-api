@@ -15,7 +15,7 @@ module.exports = {
   },
   getUserByPhone: (data, callback) => {
     db.query(
-      `select * from users where phone=? and device_id=?`,
+      `select * from users where phone=? and device_id=? and active=1`,
       [data.phone, data.device_id],
       (error, results, fields) => {
         if (error) {
@@ -60,7 +60,7 @@ module.exports = {
   updateUserById: (body, id, callback) => {
     const data = Object.keys(body).map((key) => `${key}=?`);
     db.query(
-      `update users set ${data.join(", ")} where id='?'`,
+      `update users set ${data.join(", ")} where id=?`,
       [...Object.values(body), id],
       (error, results, fields) => {
         if (error) {

@@ -3,6 +3,7 @@ const { getUsers, login } = require("./admin.service");
 require("dotenv").config();
 const jwt = require("jsonwebtoken");
 var CryptoJS = require("crypto-js");
+const { updateUserById } = require("../users/user.service");
 
 module.exports = {
   login: async (req, res) => {
@@ -43,6 +44,21 @@ module.exports = {
             .json({ status: 1, message: "success", data: response });
         } else {
           res.status(500).json({ status: 0, message: error });
+        }
+      });
+    } catch (error) {
+      res.status(500).json({ status: 0, message: error });
+    }
+  },
+  updateProfile: async (req, res) => {
+    const body = req.body;
+    const { userId = 0 } = req.params;
+    try {
+      updateUserById(body, userId, async (error) => {
+        if (error) {
+          res.status(200).json({ status: 0, message: "fail", data: null });
+        } else {
+          res.status(200).json({ status: 1, message: "success", data: null });
         }
       });
     } catch (error) {
