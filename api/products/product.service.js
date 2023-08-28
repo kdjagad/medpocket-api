@@ -63,7 +63,7 @@ module.exports = {
     );
   },
   getCart: (user, callback) => {
-    // debugger;
+    // //debugger;
     db.query(
       `select c.*,p.*,c.id as cart_id from cart c left outer join products p on p.ID=c.product_id where c.user_id=?`,
       [user.id],
@@ -76,7 +76,7 @@ module.exports = {
     );
   },
   deleteCart: (cart_id, callback) => {
-    // debugger;
+    // //debugger;
     db.query(
       `delete from cart where id=?`,
       [cart_id],

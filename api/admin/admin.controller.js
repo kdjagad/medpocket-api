@@ -3,8 +3,8 @@ const { getUsers, login } = require("./admin.service");
 require("dotenv").config();
 const jwt = require("jsonwebtoken");
 var CryptoJS = require("crypto-js");
-const { updateUserById } = require("../users/user.service");
-
+const { updateUserById, getUserById } = require("../users/user.service");
+const readXlsxFile = require("read-excel-file/node");
 module.exports = {
   login: async (req, res) => {
     try {
@@ -36,7 +36,33 @@ module.exports = {
   },
   getUsers: async (req, res) => {
     try {
-      getUsers(async (error, response) => {
+      getUsers(false, async (error, response) => {
+        response = response ? JSON.parse(JSON.stringify(response)) : null;
+        if (response) {
+          res
+            .status(200)
+            .json({ status: 1, message: "success", data: response });
+        } else {
+          res.status(500).json({ status: 0, message: error });
+        }
+      });
+    } catch (error) {
+      res.status(500).json({ status: 0, message: error });
+    }
+  },
+  getUserById: async (req, res) => {
+    try {
+      getUserById(req.params.userId, async (error, response) => {
+        response = JSON.parse(JSON.stringify(response));
+        res.status(200).json({ status: 1, message: "success", data: response });
+      });
+    } catch (error) {
+      res.status(500).json({ status: 0, message: error });
+    }
+  },
+  getStockiestRequest: async (req, res) => {
+    try {
+      getUsers(true, async (error, response) => {
         response = response ? JSON.parse(JSON.stringify(response)) : null;
         if (response) {
           res
@@ -61,6 +87,22 @@ module.exports = {
           res.status(200).json({ status: 1, message: "success", data: null });
         }
       });
+    } catch (error) {
+      res.status(500).json({ status: 0, message: error });
+    }
+  },
+  uploadCrossReference: async (req, res) => {
+    //debugger;
+    const file = req.files;
+    try {
+      readXlsxFile(file).then((rows) => console.log("rows", rows));
+      // updateUserById(body, userId, async (error) => {
+      //   if (error) {
+      //     res.status(200).json({ status: 0, message: "fail", data: null });
+      //   } else {
+      //     res.status(200).json({ status: 1, message: "success", data: null });
+      //   }
+      // });
     } catch (error) {
       res.status(500).json({ status: 0, message: error });
     }

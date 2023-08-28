@@ -1,25 +1,31 @@
 const { verifyToken } = require("../../config/hooks");
 const {
   searchCompany,
-  searchCompanyToStockiest,
-  searchStockiestToCompany,
-  searchCompanyToStockiestSearch,
-  searchStockiestToCompanySearch,
+  companyToStockiest,
+  stockestFromCompany,
+  stockiestToCompany,
+  companyFromStockiest,
+  getStockiestDetails,
 } = require("./company.controller");
 
 const router = require("express").Router();
-router.get("/search/:query", verifyToken, searchCompany);
-router.get("/to-stockiest/:query", verifyToken, searchCompanyToStockiest);
+router.get("/search/:query(*)", verifyToken, searchCompany);
+router.get("/company-to-stockiest/:query(*)", verifyToken, companyToStockiest);
 router.get(
-  "/to-stockiest/search/:company",
+  "/stockiest-from-company/:query(*)",
   verifyToken,
-  searchCompanyToStockiestSearch
+  stockestFromCompany
 );
-router.get("/from-stockiest/:query", verifyToken, searchStockiestToCompany);
+router.get("/stockiest-to-company/:query(*)", verifyToken, stockiestToCompany);
 router.get(
-  "/from-stockiest/search/:query",
+  "/company-from-stockiest/:query(*)",
   verifyToken,
-  searchStockiestToCompanySearch
+  companyFromStockiest
+);
+router.get(
+  "/stockiest-details/:stockiest(*)",
+  verifyToken,
+  getStockiestDetails
 );
 
 module.exports = router;

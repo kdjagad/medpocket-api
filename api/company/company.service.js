@@ -29,38 +29,89 @@ module.exports = {
       }
     );
   },
-  searchCompanyToStockiest: (query, user, isSearch, callback) => {
-    var queryString = `select c.*,s.* from crossreference c left outer join stockiests s ON (s.firm_name LIKE CONCAT(SUBSTRING_INDEX(c.FIRM_NAME,'-',1),'%')) where (c.COMPANY_NAME LIKE CONCAT(?,'%')) and c.CENTER=?`;
-    if (!isSearch) {
-      queryString = `select * from crossreference where (COMPANY_NAME LIKE CONCAT(?,'%')) and CENTER=?`;
-    }
+  companyToStockiest: (query, user, callback) => {
+    //debugger;
+    var queryString = `select * from crossreference where (COMPANY_NAME LIKE CONCAT(?,'%'))`;
+
     db.query(queryString, [query, user.city], (error, results, fields) => {
       if (error) {
         callback(error);
       }
-      if (isSearch)
-        results = results.filter(
-          (arr, index, self) =>
-            index === self.findIndex((t) => t.COMPANY_NAME === arr.COMPANY_NAME)
-        );
+
+      results = results.filter(
+        (arr, index, self) =>
+          index === self.findIndex((t) => t.COMPANY_NAME === arr.COMPANY_NAME)
+      );
       return callback(null, results || null);
     });
   },
-  searchStockiestToCompany: (query, user, isSearch, callback) => {
-    var queryString = `select c.*,s.* from crossreference c left outer join stockiests s ON (s.firm_name LIKE CONCAT(SUBSTRING_INDEX(c.FIRM_NAME,'-',1),'%')) where (c.FIRM_NAME LIKE CONCAT(?,'%')) and c.CENTER=?`;
-    if (!isSearch) {
-      queryString = `select * from crossreference where (FIRM_NAME LIKE CONCAT(?,'%')) and CENTER=?`;
-    }
+  stockiestFromCompany: (query, user, callback) => {
+    //debugger;
+    var queryString = `SELECT * FROM crossreference WHERE COMPANY_NAME=? and CENTER=?`;
+
     db.query(queryString, [query, user.city], (error, results, fields) => {
       if (error) {
         callback(error);
       }
-      if (isSearch)
-        results = results.filter(
-          (arr, index, self) =>
-            index === self.findIndex((t) => t.FIRM_NAME === arr.FIRM_NAME)
-        );
+
       return callback(null, results || null);
+    });
+  },
+  stockiestToCompany: (query, user, callback) => {
+    //debugger;
+    var queryString = `select * from crossreference where (FIRM_NAME LIKE CONCAT(?,'%')) and CENTER=?`;
+
+    db.query(queryString, [query, user.city], (error, results, fields) => {
+      if (error) {
+        callback(error);
+      }
+
+      results = results.length
+        ? results.filter(
+            (arr, index, self) =>
+              index === self.findIndex((t) => t.FIRM_NAME === arr.FIRM_NAME)
+          )
+        : [];
+      return callback(null, results || null);
+    });
+  },
+  companyFromStockiest: (query, user, callback) => {
+    //debugger;
+    var queryString = `select c.*,s.* from crossreference c left outer join stockiests s ON (s.firm_name LIKE CONCAT(SUBSTRING_INDEX(c.FIRM_NAME,'-',1),'%')) where (c.FIRM_NAME LIKE CONCAT(?,'%'))`;
+
+    db.query(queryString, [query, user.city], (error, results, fields) => {
+      if (error) {
+        callback(error);
+      }
+
+      results = results.filter(
+        (arr, index, self) =>
+          index === self.findIndex((t) => t.COMPANY_NAME === arr.COMPANY_NAME)
+      );
+      return callback(null, results || null);
+    });
+  },
+  getStockiestDetails: (stockiest, callback) => {
+    // debugger;
+    var queryString = `select * from stockiests where REPLACE(firm_name," ","")=REPLACE(?," ","")`;
+
+    db.query(queryString, [stockiest], (error, results, fields) => {
+      if (error) {
+        callback(error);
+      }
+
+      if (results.length) {
+        return callback(null, results || null);
+      } else {
+        var queryString1 = `select * from chemistsdruggiest where REPLACE(firm_name," ","")=REPLACE(?," ","")`;
+        db.query(queryString1, [stockiest], (error, results, fields) => {
+          // debugger;
+          if (error) {
+            callback(error);
+          }
+          return callback(null, results || null);
+        });
+      }
     });
   },
 };

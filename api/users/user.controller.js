@@ -17,7 +17,7 @@ const {
 
 module.exports = {
   login: (req, res) => {
-    // debugger;
+    // //debugger;
     const body = req.body;
     getUserByPhone(body, async (error, response) => {
       response = JSON.parse(JSON.stringify(response));
@@ -28,7 +28,7 @@ module.exports = {
           request(
             `http://msgclub.softhubinc.com/rest/otpservice/generate-otp?AUTH_KEY=${process.env.AUTH_KEY}&mobileNumber=${body.phone}`,
             function (error, resp, reqBody) {
-              // debugger;
+              // //debugger;
               reqBody = JSON.parse(reqBody);
               if (reqBody.responseCode === "3001") {
                 jwt.sign(response[0], process.env.JWT_SECRET, (err, token) => {
@@ -214,7 +214,7 @@ module.exports = {
     const body = req.body;
     const file = req.file;
     try {
-      debugger;
+      //debugger;
       addStockiest(body, req.user, file.path, async (error) => {
         if (error) {
           res.status(200).json({ status: 0, message: "fail", data: null });
