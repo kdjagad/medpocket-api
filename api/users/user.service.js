@@ -38,12 +38,16 @@ module.exports = {
     );
   },
   getCenters: (callback) => {
-    db.query(`select center from centers`, [], (error, results, fields) => {
-      if (error) {
-        callback(error);
+    db.query(
+      `select center from centers where isEnabled=1`,
+      [],
+      (error, results, fields) => {
+        if (error) {
+          callback(error);
+        }
+        return callback(null, results || null);
       }
-      return callback(null, results || null);
-    });
+    );
   },
   getCenterAds: (user, callback) => {
     db.query(
