@@ -31,14 +31,14 @@ module.exports = {
               // //debugger;
               reqBody = JSON.parse(reqBody);
               if (reqBody.responseCode === "3001") {
-                jwt.sign(response[0], process.env.JWT_SECRET, (err, token) => {
-                  res.status(200).json({
-                    status: 1,
-                    message: "success",
-                    data: response,
-                    token: token,
-                  });
+                // jwt.sign(response[0], process.env.JWT_SECRET, (err, token) => {
+                res.status(200).json({
+                  status: 1,
+                  message: "success",
+                  data: response,
+                  token: null,
                 });
+                // });
               } else {
                 res.status(500).json({
                   status: 0,
@@ -67,7 +67,6 @@ module.exports = {
         res.status(500).json({ status: 0, message: error });
       } else {
         if (response) {
-          res.status(200).json({ status: 1, message: "register successfully" });
           request(
             `http://msgclub.softhubinc.com/rest/otpservice/generate-otp?AUTH_KEY=${process.env.AUTH_KEY}&mobileNumber=${body.phone}`,
             function (error, response, reqBody) {
