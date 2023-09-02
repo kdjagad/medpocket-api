@@ -9,23 +9,11 @@ const {
 } = require("./company.controller");
 
 const router = require("express").Router();
-router.get("/search/:query(*)", verifyToken, searchCompany);
-router.get("/company-to-stockiest/:query(*)", verifyToken, companyToStockiest);
-router.get(
-  "/stockiest-from-company/:query(*)",
-  verifyToken,
-  stockestFromCompany
-);
-router.get("/stockiest-to-company/:query(*)", verifyToken, stockiestToCompany);
-router.get(
-  "/company-from-stockiest/:query(*)",
-  verifyToken,
-  companyFromStockiest
-);
-router.get(
-  "/stockiest-details/:stockiest(*)",
-  verifyToken,
-  getStockiestDetails
-);
+router.post("/search", verifyToken, searchCompany);
+router.post("/company-to-stockiest", verifyToken, companyToStockiest);
+router.post("/stockiest-from-company", verifyToken, stockestFromCompany);
+router.post("/stockiest-to-company", verifyToken, stockiestToCompany);
+router.post("/company-from-stockiest", verifyToken, companyFromStockiest);
+router.post("/stockiest-details", verifyToken, getStockiestDetails);
 
 module.exports = router;

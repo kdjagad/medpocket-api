@@ -28,7 +28,7 @@ const groupAndAdd = (arr, column) => {
 module.exports = {
   searchCompany: async (req, res) => {
     try {
-      searchCompany(req.params.query, async (error, response) => {
+      searchCompany(req.body.query, async (error, response) => {
         response = response ? JSON.parse(JSON.stringify(response)) : null;
         if (response) {
           res
@@ -44,20 +44,16 @@ module.exports = {
   },
   companyToStockiest: async (req, res) => {
     try {
-      companyToStockiest(
-        req.params.query,
-        req.user,
-        async (error, response) => {
-          response = response ? JSON.parse(JSON.stringify(response)) : null;
-          if (response) {
-            res
-              .status(200)
-              .json({ status: 1, message: "success", data: response });
-          } else {
-            res.status(500).json({ status: 0, message: error });
-          }
+      companyToStockiest(req.body.query, req.user, async (error, response) => {
+        response = response ? JSON.parse(JSON.stringify(response)) : null;
+        if (response) {
+          res
+            .status(200)
+            .json({ status: 1, message: "success", data: response });
+        } else {
+          res.status(500).json({ status: 0, message: error });
         }
-      );
+      });
     } catch (error) {
       res.status(500).json({ status: 0, message: error });
     }
@@ -65,7 +61,7 @@ module.exports = {
   stockestFromCompany: async (req, res) => {
     try {
       stockiestFromCompany(
-        req.params.query,
+        req.body.query,
         req.user,
         async (error, response) => {
           response = response ? JSON.parse(JSON.stringify(response)) : null;
@@ -84,20 +80,16 @@ module.exports = {
   },
   stockiestToCompany: async (req, res) => {
     try {
-      stockiestToCompany(
-        req.params.query,
-        req.user,
-        async (error, response) => {
-          response = response ? JSON.parse(JSON.stringify(response)) : null;
-          if (response) {
-            res
-              .status(200)
-              .json({ status: 1, message: "success", data: response });
-          } else {
-            res.status(500).json({ status: 0, message: error });
-          }
+      stockiestToCompany(req.body.query, req.user, async (error, response) => {
+        response = response ? JSON.parse(JSON.stringify(response)) : null;
+        if (response) {
+          res
+            .status(200)
+            .json({ status: 1, message: "success", data: response });
+        } else {
+          res.status(500).json({ status: 0, message: error });
         }
-      );
+      });
     } catch (error) {
       res.status(500).json({ status: 0, message: error });
     }
@@ -105,7 +97,7 @@ module.exports = {
   companyFromStockiest: async (req, res) => {
     try {
       companyFromStockiest(
-        req.params.query,
+        req.body.query,
         req.user,
         async (error, response) => {
           response = response ? JSON.parse(JSON.stringify(response)) : null;
@@ -124,7 +116,7 @@ module.exports = {
   },
   getStockiestDetails: async (req, res) => {
     try {
-      getStockiestDetails(req.params.stockiest, async (error, response) => {
+      getStockiestDetails(req.body.stockiest, async (error, response) => {
         response = response ? JSON.parse(JSON.stringify(response)) : null;
         if (response) {
           res.status(200).json({
