@@ -18,7 +18,7 @@ const db = require("../../config/db.config");
 module.exports = {
   searchCompany: (query, callback) => {
     db.query(
-      `select * from products where (COM_FULL LIKE CONCAT('%',?,'%')) group by COM_FULL`,
+      `select * from products where (COM_FULL LIKE CONCAT(?,'%')) group by COM_FULL`,
       [query],
       (error, results, fields) => {
         if (error) {
