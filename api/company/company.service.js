@@ -18,7 +18,8 @@ const db = require("../../config/db.config");
 module.exports = {
   searchCompany: (query, callback) => {
     db.query(
-      `select * from products where (COM_FULL LIKE CONCAT(?,'%')) group by COM_FULL`,
+      `select * from products WHERE MATCH(COM_FULL) AGAINST(?) group by COM_FULL`,
+      // `select * from products where (COM_FULL LIKE CONCAT('%',?,'%')) group by COM_FULL`,
       [query],
       (error, results, fields) => {
         if (error) {
@@ -31,7 +32,7 @@ module.exports = {
   },
   companyToStockiest: (query, user, callback) => {
     //debugger;
-    var queryString = `select * from crossreference where (COMPANY_NAME LIKE CONCAT(?,'%'))`;
+    var queryString = `select * from crossreference where (COMPANY_NAME LIKE CONCAT(?,'%')) and CENTER=?`;
 
     db.query(queryString, [query, user.city], (error, results, fields) => {
       if (error) {

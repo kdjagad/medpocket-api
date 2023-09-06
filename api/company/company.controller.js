@@ -66,6 +66,9 @@ module.exports = {
         async (error, response) => {
           response = response ? JSON.parse(JSON.stringify(response)) : null;
           if (response) {
+            response = response.sort((a, b) =>
+              a["FIRM_NAME"].localeCompare(b["FIRM_NAME"])
+            );
             res
               .status(200)
               .json({ status: 1, message: "success", data: response });
