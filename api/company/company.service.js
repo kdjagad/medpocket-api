@@ -32,19 +32,23 @@ module.exports = {
   },
   companyToStockiest: (query, user, callback) => {
     //debugger;
-    var queryString = `select * from crossreference where (COMPANY_NAME LIKE CONCAT(?,'%')) and CENTER=?`;
+    var queryString = `select * from crossreference where (COMPANY_NAME LIKE CONCAT(?,'%') || (MATCH(COMPANY_NAME) AGAINST(?))) and CENTER=?`;
 
-    db.query(queryString, [query, user.city], (error, results, fields) => {
-      if (error) {
-        callback(error);
+    db.query(
+      queryString,
+      [query, query, user.city],
+      (error, results, fields) => {
+        if (error) {
+          callback(error);
+        }
+
+        results = results.filter(
+          (arr, index, self) =>
+            index === self.findIndex((t) => t.COMPANY_NAME === arr.COMPANY_NAME)
+        );
+        return callback(null, results || null);
       }
-
-      results = results.filter(
-        (arr, index, self) =>
-          index === self.findIndex((t) => t.COMPANY_NAME === arr.COMPANY_NAME)
-      );
-      return callback(null, results || null);
-    });
+    );
   },
   stockiestFromCompany: (query, user, callback) => {
     //debugger;
@@ -60,21 +64,25 @@ module.exports = {
   },
   stockiestToCompany: (query, user, callback) => {
     //debugger;
-    var queryString = `select * from crossreference where (FIRM_NAME LIKE CONCAT(?,'%')) and CENTER=?`;
+    var queryString = `select * from crossreference where (FIRM_NAME LIKE CONCAT(?,'%') || (MATCH(FIRM_NAME) AGAINST(?))) and CENTER=?`;
 
-    db.query(queryString, [query, user.city], (error, results, fields) => {
-      if (error) {
-        callback(error);
+    db.query(
+      queryString,
+      [query, query, user.city],
+      (error, results, fields) => {
+        if (error) {
+          callback(error);
+        }
+
+        results = results.length
+          ? results.filter(
+              (arr, index, self) =>
+                index === self.findIndex((t) => t.FIRM_NAME === arr.FIRM_NAME)
+            )
+          : [];
+        return callback(null, results || null);
       }
-
-      results = results.length
-        ? results.filter(
-            (arr, index, self) =>
-              index === self.findIndex((t) => t.FIRM_NAME === arr.FIRM_NAME)
-          )
-        : [];
-      return callback(null, results || null);
-    });
+    );
   },
   companyFromStockiest: (query, user, callback) => {
     //debugger;

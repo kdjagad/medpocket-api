@@ -31,6 +31,9 @@ module.exports = {
       searchCompany(req.body.query, async (error, response) => {
         response = response ? JSON.parse(JSON.stringify(response)) : null;
         if (response) {
+          response = response.sort((a, b) =>
+            a["COMPANY"].localeCompare(b["COMPANY"])
+          );
           res
             .status(200)
             .json({ status: 1, message: "success", data: response });
@@ -47,6 +50,9 @@ module.exports = {
       companyToStockiest(req.body.query, req.user, async (error, response) => {
         response = response ? JSON.parse(JSON.stringify(response)) : null;
         if (response) {
+          response = response.sort((a, b) =>
+            a["COMPANY_NAME"].localeCompare(b["COMPANY_NAME"])
+          );
           res
             .status(200)
             .json({ status: 1, message: "success", data: response });
@@ -86,6 +92,9 @@ module.exports = {
       stockiestToCompany(req.body.query, req.user, async (error, response) => {
         response = response ? JSON.parse(JSON.stringify(response)) : null;
         if (response) {
+          response = response.sort((a, b) =>
+            a["FIRM_NAME"].localeCompare(b["FIRM_NAME"])
+          );
           res
             .status(200)
             .json({ status: 1, message: "success", data: response });
@@ -105,6 +114,9 @@ module.exports = {
         async (error, response) => {
           response = response ? JSON.parse(JSON.stringify(response)) : null;
           if (response) {
+            response = response.sort((a, b) =>
+              a["COMPANY_NAME"].localeCompare(b["COMPANY_NAME"])
+            );
             res
               .status(200)
               .json({ status: 1, message: "success", data: response });
