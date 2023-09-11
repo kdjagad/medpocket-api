@@ -4,6 +4,11 @@ const {
   getUserById,
   updateUserById,
   getKeys,
+  getNews,
+  getCenters,
+  addNews,
+  getFcmTokens,
+  sendPushNotification,
 } = require("./admin.service");
 
 require("dotenv").config();
@@ -71,6 +76,38 @@ module.exports = {
       res.status(500).json({ status: 0, message: error });
     }
   },
+  getNews: async (req, res) => {
+    try {
+      getNews(async (error, response) => {
+        response = response ? JSON.parse(JSON.stringify(response)) : null;
+        if (response) {
+          res
+            .status(200)
+            .json({ status: 1, message: "success", data: response });
+        } else {
+          res.status(500).json({ status: 0, message: error });
+        }
+      });
+    } catch (error) {
+      res.status(500).json({ status: 0, message: error });
+    }
+  },
+  getCenters: async (req, res) => {
+    try {
+      getCenters(async (error, response) => {
+        response = response ? JSON.parse(JSON.stringify(response)) : null;
+        if (response) {
+          res
+            .status(200)
+            .json({ status: 1, message: "success", data: response });
+        } else {
+          res.status(500).json({ status: 0, message: error });
+        }
+      });
+    } catch (error) {
+      res.status(500).json({ status: 0, message: error });
+    }
+  },
   getUserById: async (req, res) => {
     try {
       getUserById(req.params.userId, async (error, response) => {
@@ -124,6 +161,37 @@ module.exports = {
       //     res.status(200).json({ status: 1, message: "success", data: null });
       //   }
       // });
+    } catch (error) {
+      res.status(500).json({ status: 0, message: error });
+    }
+  },
+  postNews: async (req, res) => {
+    const body = req.body;
+    try {
+      addNews(body, async (error) => {
+        if (error) {
+          res.status(500).json({ status: 0, message: "fail", data: null });
+        } else {
+          getFcmTokens(body.center, async (err, resp) => {
+            if (!err) {
+              sendPushNotification(
+                resp,
+                body.messageHeader,
+                body.messageDetail,
+                async (er, response) => {
+                  if (er) res.status(500).json({ status: 0, message: er });
+                  else
+                    res
+                      .status(200)
+                      .json({ status: 1, message: "success", data: null });
+                }
+              );
+            } else {
+              res.status(500).json({ status: 0, message: err });
+            }
+          });
+        }
+      });
     } catch (error) {
       res.status(500).json({ status: 0, message: error });
     }

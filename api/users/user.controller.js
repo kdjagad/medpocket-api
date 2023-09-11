@@ -123,20 +123,11 @@ module.exports = {
       } else {
         if (response.length > 0) {
           if (body.phone == "9090909090" && body.otp == "123456") {
-            jwt.sign(response[0], process.env.JWT_SECRET, (err, token) => {
-              res.status(200).json({
-                status: 1,
-                message: "success",
-                data: response,
-                token: token,
-              });
-            });
-          } else {
-            request(
-              `http://msgclub.softhubinc.com/rest/otpservice/verify-otp?AUTH_KEY=${process.env.AUTH_KEY}&mobileNumber=${body.phone}&otp=${body.otp}`,
-              function (error, resp, reqBody) {
-                reqBody = JSON.parse(reqBody);
-                if (reqBody.responseCode === 2004) {
+            updateUserById(
+              { fcm_token: body["fcm_token"] },
+              response[0]["id"],
+              async (err) => {
+                if (!err) {
                   jwt.sign(
                     response[0],
                     process.env.JWT_SECRET,
@@ -147,6 +138,49 @@ module.exports = {
                         data: response,
                         token: token,
                       });
+                    }
+                  );
+                } else {
+                  res.status(500).json({
+                    status: 0,
+                    message: reqBody.response,
+                    data: null,
+                    token: null,
+                  });
+                }
+              }
+            );
+          } else {
+            request(
+              `http://msgclub.softhubinc.com/rest/otpservice/verify-otp?AUTH_KEY=${process.env.AUTH_KEY}&mobileNumber=${body.phone}&otp=${body.otp}`,
+              function (error, resp, reqBody) {
+                reqBody = JSON.parse(reqBody);
+                if (reqBody.responseCode === 2004) {
+                  updateUserById(
+                    { fcm_token: body["fcm_token"] },
+                    response[0]["id"],
+                    async (errs) => {
+                      if (!errs) {
+                        jwt.sign(
+                          response[0],
+                          process.env.JWT_SECRET,
+                          (err, token) => {
+                            res.status(200).json({
+                              status: 1,
+                              message: "success",
+                              data: response,
+                              token: token,
+                            });
+                          }
+                        );
+                      } else {
+                        res.status(500).json({
+                          status: 0,
+                          message: reqBody.response,
+                          data: null,
+                          token: null,
+                        });
+                      }
                     }
                   );
                 } else {
