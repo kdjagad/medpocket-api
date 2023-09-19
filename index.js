@@ -7,10 +7,7 @@ const app = express();
 app.use(cors());
 const port = process.env.PORT || 5000;
 
-// parse application/x-www-form-urlencoded
 app.use(bodyParser.urlencoded({ extended: false }));
-
-// parse application/json
 app.use(bodyParser.json());
 
 const usersRouter = require("./api/users/user.router");
@@ -33,8 +30,10 @@ app.use("/api/v1/news", newsRouter);
 app.use("/api/v1/licences", licencesRouter);
 
 const adminRouter = require("./api/admin/admin.router");
-
 app.use("/api/v1/admin", adminRouter);
+
+app.use(express.static("public"));
+app.use("/uploads", express.static("uploads"));
 
 app.listen(port, "0.0.0.0", () => {
   console.log("app started on port " + port);
