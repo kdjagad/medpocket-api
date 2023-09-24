@@ -346,21 +346,23 @@ module.exports = {
         sheets.includes("CHEMISTS & DRUGGISTS")
       ) {
         var dataObj = [];
-        sheets.map((sheet) => {
-          switch (sheet) {
-            case "CROSSREFERENCE":
-              const rows = reader.utils.sheet_to_json(
-                excelFile.Sheets["CROSSREFERENCE"]
-              );
-              uploadCrossReferences(rows, (error, resp) => {
-                dataObj.push(resp);
-              });
-              break;
+        Promise.all(
+          sheets.map(async (sheet) => {
+            switch (sheet) {
+              case "CROSSREFERENCE":
+                const rows = reader.utils.sheet_to_json(
+                  excelFile.Sheets["CROSSREFERENCE"]
+                );
+                await uploadCrossReferences(rows, (error, resp) => {
+                  dataObj.push(resp);
+                });
+                break;
 
-            default:
-              break;
-          }
-        });
+              default:
+                break;
+            }
+          })
+        );
         res.status(200).json({ status: 1, message: "success", data: dataObj });
       } else {
         res.status(500).json({
