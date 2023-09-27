@@ -289,7 +289,7 @@ module.exports = {
     );
   },
   getFcmTokens: (center, callback) => {
-    var where = " WHERE AND city=?";
+    var where = " WHERE city=?";
     if (center == "All") where = "";
     db.query(
       `select * from users ${where}`,
