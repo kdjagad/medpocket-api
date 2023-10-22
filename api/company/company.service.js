@@ -30,11 +30,11 @@ module.exports = {
       }
     );
   },
-  companyToStockiest: (query, user, callback) => {
+  companyToStockiest: (query, city, callback) => {
     //
     var queryString = `select * from crossreference where MATCH(COMPANY_NAME) AGAINST(?) and CENTER=?`;
 
-    db.query(queryString, [query, user.city], (error, results, fields) => {
+    db.query(queryString, [query, city], (error, results, fields) => {
       if (error) {
         callback(error);
       }
@@ -46,11 +46,11 @@ module.exports = {
       return callback(null, results || null);
     });
   },
-  stockiestFromCompany: (query, user, callback) => {
+  stockiestFromCompany: (query, city, callback) => {
     //
     var queryString = `SELECT * FROM crossreference WHERE COMPANY_NAME=? and CENTER=?`;
 
-    db.query(queryString, [query, user.city], (error, results, fields) => {
+    db.query(queryString, [query, city], (error, results, fields) => {
       if (error) {
         callback(error);
       }
@@ -58,11 +58,11 @@ module.exports = {
       return callback(null, results || null);
     });
   },
-  stockiestToCompany: (query, user, callback) => {
+  stockiestToCompany: (query, city, callback) => {
     //
     var queryString = `select * from crossreference where MATCH(FIRM_NAME) AGAINST(?) and CENTER=?`;
 
-    db.query(queryString, [query, user.city], (error, results, fields) => {
+    db.query(queryString, [query, city], (error, results, fields) => {
       if (error) {
         callback(error);
       }
@@ -76,11 +76,11 @@ module.exports = {
       return callback(null, results || null);
     });
   },
-  companyFromStockiest: (query, user, callback) => {
+  companyFromStockiest: (query, city, callback) => {
     //
     var queryString = `select c.*,s.* from crossreference c left outer join stockiests s ON (s.firm_name LIKE CONCAT(SUBSTRING_INDEX(c.FIRM_NAME,'-',1),'%')) where (c.FIRM_NAME LIKE CONCAT(?,'%'))`;
 
-    db.query(queryString, [query, user.city], (error, results, fields) => {
+    db.query(queryString, [query, city], (error, results, fields) => {
       if (error) {
         callback(error);
       }
@@ -95,8 +95,10 @@ module.exports = {
   getStockiestDetails: (stockiest, callback) => {
     //
     var queryString = `select * from stockiests where REPLACE(firm_name," ","")=REPLACE(?," ","")`;
+    // var queryString = `select * from stockiests where firm_name LIKE CONCAT(SUBSTRING_INDEX(?,'-',1),'%')`;
 
     db.query(queryString, [stockiest], (error, results, fields) => {
+      // debugger;
       if (error) {
         callback(error);
       }
@@ -105,7 +107,9 @@ module.exports = {
         return callback(null, results || null);
       } else {
         var queryString1 = `select * from chemistsdruggiest where REPLACE(firm_name," ","")=REPLACE(?," ","")`;
+        // var queryString1 = `select * from chemistsdruggiest where firm_name LIKE CONCAT(SUBSTRING_INDEX(?,'-',1),'%')`;
         db.query(queryString1, [stockiest], (error, results, fields) => {
+          // debugger;
           //
           if (error) {
             callback(error);

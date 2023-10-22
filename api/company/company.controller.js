@@ -47,19 +47,23 @@ module.exports = {
   },
   companyToStockiest: async (req, res) => {
     try {
-      companyToStockiest(req.body.query, req.user, async (error, response) => {
-        response = response ? JSON.parse(JSON.stringify(response)) : null;
-        if (response) {
-          response = response.sort((a, b) =>
-            a["COMPANY_NAME"].localeCompare(b["COMPANY_NAME"])
-          );
-          res
-            .status(200)
-            .json({ status: 1, message: "success", data: response });
-        } else {
-          res.status(500).json({ status: 0, message: error });
+      companyToStockiest(
+        req.body.query,
+        req.user ? req.use.city : req.body.city,
+        async (error, response) => {
+          response = response ? JSON.parse(JSON.stringify(response)) : null;
+          if (response) {
+            response = response.sort((a, b) =>
+              a["COMPANY_NAME"].localeCompare(b["COMPANY_NAME"])
+            );
+            res
+              .status(200)
+              .json({ status: 1, message: "success", data: response });
+          } else {
+            res.status(500).json({ status: 0, message: error });
+          }
         }
-      });
+      );
     } catch (error) {
       res.status(500).json({ status: 0, message: error });
     }
@@ -68,7 +72,7 @@ module.exports = {
     try {
       stockiestFromCompany(
         req.body.query,
-        req.user,
+        req.user ? req.use.city : req.body.city,
         async (error, response) => {
           response = response ? JSON.parse(JSON.stringify(response)) : null;
           if (response) {
@@ -89,19 +93,23 @@ module.exports = {
   },
   stockiestToCompany: async (req, res) => {
     try {
-      stockiestToCompany(req.body.query, req.user, async (error, response) => {
-        response = response ? JSON.parse(JSON.stringify(response)) : null;
-        if (response) {
-          response = response.sort((a, b) =>
-            a["FIRM_NAME"].localeCompare(b["FIRM_NAME"])
-          );
-          res
-            .status(200)
-            .json({ status: 1, message: "success", data: response });
-        } else {
-          res.status(500).json({ status: 0, message: error });
+      stockiestToCompany(
+        req.body.query,
+        req.user ? req.use.city : req.body.city,
+        async (error, response) => {
+          response = response ? JSON.parse(JSON.stringify(response)) : null;
+          if (response) {
+            response = response.sort((a, b) =>
+              a["FIRM_NAME"].localeCompare(b["FIRM_NAME"])
+            );
+            res
+              .status(200)
+              .json({ status: 1, message: "success", data: response });
+          } else {
+            res.status(500).json({ status: 0, message: error });
+          }
         }
-      });
+      );
     } catch (error) {
       res.status(500).json({ status: 0, message: error });
     }
@@ -110,7 +118,7 @@ module.exports = {
     try {
       companyFromStockiest(
         req.body.query,
-        req.user,
+        req.user ? req.use.city : req.body.city,
         async (error, response) => {
           response = response ? JSON.parse(JSON.stringify(response)) : null;
           if (response) {
