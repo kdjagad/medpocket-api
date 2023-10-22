@@ -26,7 +26,7 @@ async function checkDuplicate(row, table) {
 }
 function insertRows(rows, table) {
   return new Promise((resolve, reject) => {
-    debugger;
+    //debugger;
     const keys = Object.keys(rows[0]);
     var vals = [];
     rows.map((row) => {
@@ -140,7 +140,7 @@ module.exports = {
 
     attachments.map((attach) => {
       var str = `(${body.center_id},${`'${baseUrl}/${attach.path}'`})`;
-      // debugger;
+      // //debugger;
       values.push(cleanUrl(str));
     });
     db.query(
@@ -311,21 +311,36 @@ module.exports = {
     );
   },
 
-  uploadCrossReferences: async (data, callback) => {
-    debugger;
-    var rowsAffected = 0;
-    var insRows = [];
-    await Promise.all(
-      data.map(async (row) => {
-        const isExist = await checkDuplicate(row, "crossreference");
-        if (!isExist) {
-          insRows.push(row);
-          // rowsAffected += 1;
+  uploadCrossReferences: (data) =>
+    new Promise(async (resolve, reject) => {
+      db.query(
+        `delete from crossreference`,
+        [],
+        async (error, results, fields) => {
+          debugger;
+          if (error) {
+            reject(error);
+          } else {
+            var length = data.length || 0;
+            var rowsAffected = 0;
+            var parts = [];
+            var count = 10000;
+            var pages = Math.floor(length / count);
+            for (var i = 0; i <= pages; i++) {
+              var partArray = data.slice(i * 100, i * 100 + count);
+              parts.push(partArray);
+            }
+            await Promise.all(
+              parts.map(async (partData) => {
+                debugger;
+                if (partData.length)
+                  await insertRows(partData, "crossreference");
+              })
+            );
+            debugger;
+            resolve(true);
+          }
         }
-      })
-    );
-    debugger;
-    await insertRows(insRows, "crossreference");
-    return callback(null, { crossRefRowsAffected: rowsAffected });
-  },
+      );
+    }),
 };

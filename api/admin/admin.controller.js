@@ -37,7 +37,8 @@ module.exports = {
         CryptoJS.MD5(req.body.password).toString(),
         async (error, response) => {
           response = response ? JSON.parse(JSON.stringify(response)) : null;
-          if (response) {
+          console.log("resp", response);
+          if (response.length) {
             jwt.sign(response[0], process.env.JWT_SECRET, (err, token) => {
               res.status(200).json({
                 status: 1,
@@ -166,7 +167,7 @@ module.exports = {
     let { body = {} } = req;
     let { centerAds = [] } = req.files;
     var baseUrl = `${req.protocol}://${req.get("host")}`;
-    // debugger;
+    // //debugger;
     try {
       postCenterAds(body, centerAds, baseUrl, async (error, response) => {
         response = response ? JSON.parse(JSON.stringify(response)) : null;
@@ -334,36 +335,37 @@ module.exports = {
     }
   },
   uploadCrossReference: async (req, res) => {
+    debugger;
     const file = req.files["crossRef"][0];
 
     try {
       const { path = "" } = file;
       const excelFile = reader.readFile(path);
       const sheets = excelFile.SheetNames;
-      if (
-        sheets.includes("CROSSREFERENCE") &&
-        sheets.includes("STOCKIST") &&
-        sheets.includes("CHEMISTS & DRUGGISTS")
-      ) {
+      // if (
+      //   sheets.includes("CROSSREFERENCE") &&
+      //   sheets.includes("STOCKIST") &&
+      //   sheets.includes("CHEMISTS & DRUGGISTS")
+      // ) {
+      if (sheets.includes("CROSSREFERENCE")) {
         var dataObj = [];
-        Promise.all(
-          sheets.map(async (sheet) => {
-            switch (sheet) {
-              case "CROSSREFERENCE":
-                const rows = reader.utils.sheet_to_json(
-                  excelFile.Sheets["CROSSREFERENCE"]
-                );
-                await uploadCrossReferences(rows, (error, resp) => {
-                  dataObj.push(resp);
-                });
-                break;
+        sheets.map(async (sheet) => {
+          switch (sheet) {
+            case "CROSSREFERENCE":
+              debugger;
+              const rows = reader.utils.sheet_to_json(
+                excelFile.Sheets["CROSSREFERENCE"]
+              );
+              const ress = await uploadCrossReferences(rows);
+              res
+                .status(200)
+                .json({ status: 1, message: "success", data: ress });
+              break;
 
-              default:
-                break;
-            }
-          })
-        );
-        res.status(200).json({ status: 1, message: "success", data: dataObj });
+            default:
+              break;
+          }
+        });
       } else {
         res.status(500).json({
           status: 0,
