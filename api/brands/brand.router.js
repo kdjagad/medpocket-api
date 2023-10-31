@@ -7,6 +7,7 @@ const {
 
 const router = require("express").Router();
 router.post("/search", verifyToken, searchBrand);
+router.post("/search-external", searchBrand);
 router.get("/search/company/:companyId", verifyToken, searchBrandByCompany);
 router.get("/search/generic/:generic", verifyToken, searchBrandByGeneric);
 
