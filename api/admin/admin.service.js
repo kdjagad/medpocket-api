@@ -317,7 +317,6 @@ module.exports = {
         `delete from crossreference`,
         [],
         async (error, results, fields) => {
-          debugger;
           if (error) {
             reject(error);
           } else {
@@ -332,12 +331,10 @@ module.exports = {
             }
             await Promise.all(
               parts.map(async (partData) => {
-                debugger;
                 if (partData.length)
                   await insertRows(partData, "crossreference");
               })
             );
-            debugger;
             resolve(true);
           }
         }

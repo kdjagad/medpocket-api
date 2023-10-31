@@ -49,7 +49,7 @@ module.exports = {
     try {
       companyToStockiest(
         req.body.query,
-        req.user ? req.use.city : req.body.city,
+        req.user ? req.user.city : req.body.city,
         async (error, response) => {
           response = response ? JSON.parse(JSON.stringify(response)) : null;
           if (response) {
@@ -72,7 +72,7 @@ module.exports = {
     try {
       stockiestFromCompany(
         req.body.query,
-        req.user ? req.use.city : req.body.city,
+        req.user ? req.user.city : req.body.city,
         async (error, response) => {
           response = response ? JSON.parse(JSON.stringify(response)) : null;
           if (response) {
@@ -95,7 +95,7 @@ module.exports = {
     try {
       stockiestToCompany(
         req.body.query,
-        req.user ? req.use.city : req.body.city,
+        req.user ? req.user.city : req.body.city,
         async (error, response) => {
           response = response ? JSON.parse(JSON.stringify(response)) : null;
           if (response) {
@@ -118,7 +118,7 @@ module.exports = {
     try {
       companyFromStockiest(
         req.body.query,
-        req.user ? req.use.city : req.body.city,
+        req.user ? req.user.city : req.body.city,
         async (error, response) => {
           response = response ? JSON.parse(JSON.stringify(response)) : null;
           if (response) {
