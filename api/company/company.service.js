@@ -15,12 +15,19 @@ const db = require("../../config/db.config");
 //   return arr;
 // };
 
+const formatQuery = (query) => {
+  return query
+    .split(" ")
+    .map((q) => `+${q}`)
+    .join(" ");
+};
+
 module.exports = {
   searchCompany: (query, callback) => {
     db.query(
-      `select * from products WHERE MATCH(COM_FULL) AGAINST(?) group by COM_FULL`,
+      `select * from products WHERE MATCH(COM_FULL) AGAINST(? IN BOOLEAN MODE) group by COM_FULL`,
       // `select * from products where (COM_FULL LIKE CONCAT('%',?,'%')) group by COM_FULL`,
-      [query],
+      [formatQuery(query)],
       (error, results, fields) => {
         if (error) {
           callback(error);
@@ -32,19 +39,23 @@ module.exports = {
   },
   companyToStockiest: (query, city, callback) => {
     //
-    var queryString = `select * from crossreference where MATCH(COMPANY_NAME) AGAINST(?) and CENTER=?`;
+    var queryString = `select * from crossreference where MATCH(COMPANY_NAME) AGAINST(? IN BOOLEAN MODE) and CENTER=?`;
 
-    db.query(queryString, [query, city], (error, results, fields) => {
-      if (error) {
-        callback(error);
+    db.query(
+      queryString,
+      [formatQuery(query), city],
+      (error, results, fields) => {
+        if (error) {
+          callback(error);
+        }
+
+        results = results.filter(
+          (arr, index, self) =>
+            index === self.findIndex((t) => t.COMPANY_NAME === arr.COMPANY_NAME)
+        );
+        return callback(null, results || null);
       }
-
-      results = results.filter(
-        (arr, index, self) =>
-          index === self.findIndex((t) => t.COMPANY_NAME === arr.COMPANY_NAME)
-      );
-      return callback(null, results || null);
-    });
+    );
   },
   stockiestFromCompany: (query, city, callback) => {
     //
@@ -60,21 +71,25 @@ module.exports = {
   },
   stockiestToCompany: (query, city, callback) => {
     //
-    var queryString = `select * from crossreference where MATCH(FIRM_NAME) AGAINST(?) and CENTER=?`;
+    var queryString = `select * from crossreference where MATCH(FIRM_NAME) AGAINST(? IN BOOLEAN MODE) and CENTER=?`;
 
-    db.query(queryString, [query, city], (error, results, fields) => {
-      if (error) {
-        callback(error);
+    db.query(
+      queryString,
+      [formatQuery(query), city],
+      (error, results, fields) => {
+        if (error) {
+          callback(error);
+        }
+
+        results = results.length
+          ? results.filter(
+              (arr, index, self) =>
+                index === self.findIndex((t) => t.FIRM_NAME === arr.FIRM_NAME)
+            )
+          : [];
+        return callback(null, results || null);
       }
-
-      results = results.length
-        ? results.filter(
-            (arr, index, self) =>
-              index === self.findIndex((t) => t.FIRM_NAME === arr.FIRM_NAME)
-          )
-        : [];
-      return callback(null, results || null);
-    });
+    );
   },
   companyFromStockiest: (query, city, callback) => {
     //
