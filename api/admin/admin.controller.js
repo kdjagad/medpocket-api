@@ -16,7 +16,7 @@ const {
   updateCenterById,
   deleteCenters,
   postCenterAds,
-  uploadCrossReferences,
+  uploadData,
 } = require("./admin.service");
 
 require("dotenv").config();
@@ -27,6 +27,22 @@ const reader = require("xlsx");
 
 function cleanUrl(url) {
   return url.replace(/\\/g, "/");
+}
+
+function filterArray(arr) {
+  var rArray = [];
+
+  arr.map((ar) => {
+    for (key in ar) {
+      if (ar.hasOwnProperty(key) && key.toLowerCase().includes("empty")) {
+        delete ar[key];
+      }
+    }
+    rArray.push(ar);
+  });
+
+  debugger;
+  return rArray;
 }
 
 module.exports = {
@@ -334,37 +350,65 @@ module.exports = {
       res.status(500).json({ status: 0, message: error });
     }
   },
-  uploadCrossReference: async (req, res) => {
+  uploadDataSheet: async (req, res) => {
     debugger;
-    const file = req.files["crossRef"][0];
+    const file = req.files["file"][0];
 
     try {
       const { path = "" } = file;
       const excelFile = reader.readFile(path);
       const sheets = excelFile.SheetNames;
-      // if (
-      //   sheets.includes("CROSSREFERENCE") &&
-      //   sheets.includes("STOCKIST") &&
-      //   sheets.includes("CHEMISTS & DRUGGISTS")
-      // ) {
-      if (sheets.includes("CROSSREFERENCE")) {
-        var dataObj = [];
-        sheets.map(async (sheet) => {
-          switch (sheet) {
-            case "CROSSREFERENCE":
-              debugger;
-              const rows = reader.utils.sheet_to_json(
-                excelFile.Sheets["CROSSREFERENCE"]
-              );
-              const ress = await uploadCrossReferences(rows);
-              res
-                .status(200)
-                .json({ status: 1, message: "success", data: ress });
-              break;
+      if (
+        sheets.includes("CROSSREFERENCE") &&
+        sheets.includes("STOCKIST") &&
+        sheets.includes("CHEMISTS_DRUGGISTS")
+      ) {
+        // if (sheets.includes("CROSSREFERENCE")) {
+        var successMessage = [];
+        await Promise.all(
+          sheets.map(async (sheet) => {
+            switch (sheet) {
+              case "CROSSREFERENCE":
+                debugger;
+                let rows = reader.utils.sheet_to_json(
+                  excelFile.Sheets["CROSSREFERENCE"],
+                  { defval: "" }
+                );
+                rows = filterArray(rows);
+                const ress = await uploadData(rows, "crossreference");
+                if (ress) successMessage.push("Cross Ref. Uploaded");
+                break;
+              case "STOCKIST":
+                debugger;
+                let rows1 = reader.utils.sheet_to_json(
+                  excelFile.Sheets["STOCKIST"],
+                  { defval: "", blankrows: false, skipHidden: true }
+                );
+                rows1 = filterArray(rows1);
+                const ress1 = await uploadData(rows1, "stockiests");
+                if (ress1) successMessage.push("Stockiests Uploaded");
+                break;
+              case "CHEMISTS_DRUGGISTS":
+                debugger;
+                let rows2 = reader.utils.sheet_to_json(
+                  excelFile.Sheets["CHEMISTS_DRUGGISTS"],
+                  { defval: "", blankrows: false, skipHidden: true }
+                );
+                rows2 = filterArray(rows2);
+                const ress2 = await uploadData(rows2, "chemistsdruggiest");
+                if (ress2) successMessage.push("Chemists & Druggiest Uploaded");
+                break;
 
-            default:
-              break;
-          }
+              default:
+                break;
+            }
+          })
+        );
+        debugger;
+        res.status(200).json({
+          status: 1,
+          message: successMessage.join(" | "),
+          data: null,
         });
       } else {
         res.status(500).json({

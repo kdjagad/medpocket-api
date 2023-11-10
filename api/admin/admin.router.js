@@ -5,7 +5,6 @@ const {
   updateProfile,
   getStockiestRequest,
   getUserById,
-  uploadCrossReference,
   getKeys,
   getNews,
   getCenters,
@@ -17,6 +16,7 @@ const {
   updateCenterById,
   deleteCenter,
   postCenterAds,
+  uploadDataSheet,
 } = require("./admin.controller");
 
 const router = require("express").Router();
@@ -105,10 +105,10 @@ router.get("/users/:userId", verifyToken, getUserById);
 router.get("/stockiest", verifyToken, getStockiestRequest);
 router.post("/users/:userId", verifyToken, updateProfile);
 router.post(
-  "/crossref",
+  "/upload",
   // verifyToken,
-  uploadCrossRef.fields([{ name: "crossRef", maxCount: 100 }]),
-  uploadCrossReference
+  uploadCrossRef.fields([{ name: "file", maxCount: 100 }]),
+  uploadDataSheet
 );
 
 module.exports = router;

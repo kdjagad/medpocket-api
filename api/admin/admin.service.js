@@ -32,6 +32,7 @@ function insertRows(rows, table) {
     rows.map((row) => {
       var values = Object.values(row);
       values = values.map((val) => addslashes(val));
+      // values = values.map((val) => addslashes(val));
 
       vals.push(`('${values.join("','")}')`);
     });
@@ -47,15 +48,20 @@ function insertRows(rows, table) {
 }
 
 function addslashes(string) {
-  return string
-    .replace(/\\/g, "\\\\")
-    .replace(/\u0008/g, "\\b")
-    .replace(/\t/g, "\\t")
-    .replace(/\n/g, "\\n")
-    .replace(/\f/g, "\\f")
-    .replace(/\r/g, "\\r")
-    .replace(/'/g, "\\'")
-    .replace(/"/g, '\\"');
+  // string = string.toString();
+  // console.log("string --- ", string);
+  // debugger;
+  if (typeof string === "string" || string instanceof String)
+    return string
+      .replace(/\\/g, "\\\\")
+      .replace(/\u0008/g, "\\b")
+      .replace(/\t/g, "\\t")
+      .replace(/\n/g, "\\n")
+      .replace(/\f/g, "\\f")
+      .replace(/\r/g, "\\r")
+      .replace(/'/g, "\\'")
+      .replace(/"/g, '\\"');
+  else return string;
 }
 
 module.exports = {
@@ -311,33 +317,28 @@ module.exports = {
     );
   },
 
-  uploadCrossReferences: (data) =>
+  uploadData: (data, table) =>
     new Promise(async (resolve, reject) => {
-      db.query(
-        `delete from crossreference`,
-        [],
-        async (error, results, fields) => {
-          if (error) {
-            reject(error);
-          } else {
-            var length = data.length || 0;
-            var rowsAffected = 0;
-            var parts = [];
-            var count = 10000;
-            var pages = Math.floor(length / count);
-            for (var i = 0; i <= pages; i++) {
-              var partArray = data.slice(i * 100, i * 100 + count);
-              parts.push(partArray);
-            }
-            await Promise.all(
-              parts.map(async (partData) => {
-                if (partData.length)
-                  await insertRows(partData, "crossreference");
-              })
-            );
-            resolve(true);
+      db.query(`delete from ${table}`, [], async (error, results, fields) => {
+        if (error) {
+          reject(error);
+        } else {
+          var length = data.length || 0;
+          var rowsAffected = 0;
+          var parts = [];
+          var count = 10000;
+          var pages = Math.floor(length / count);
+          for (var i = 0; i <= pages; i++) {
+            var partArray = data.slice(i * 100, i * 100 + count);
+            parts.push(partArray);
           }
+          await Promise.all(
+            parts.map(async (partData) => {
+              if (partData.length) await insertRows(partData, table);
+            })
+          );
+          resolve(true);
         }
-      );
+      });
     }),
 };
