@@ -17,6 +17,10 @@ const {
   deleteCenters,
   postCenterAds,
   uploadData,
+  getKeysBatch,
+  addKeysBatch,
+  generateLicences,
+  deleteBatch,
 } = require("./admin.service");
 
 require("dotenv").config();
@@ -41,7 +45,7 @@ function filterArray(arr) {
     rArray.push(ar);
   });
 
-  debugger;
+  ////debugger;
   return rArray;
 }
 
@@ -52,6 +56,7 @@ module.exports = {
         req.body.username,
         CryptoJS.MD5(req.body.password).toString(),
         async (error, response) => {
+          ////debugger;
           response = response ? JSON.parse(JSON.stringify(response)) : null;
           console.log("resp", response);
           if (response.length) {
@@ -92,8 +97,9 @@ module.exports = {
     }
   },
   getKeys: async (req, res) => {
+    const { id = null } = req.params;
     try {
-      getKeys(async (error, response) => {
+      getKeys(id, async (error, response) => {
         response = response ? JSON.parse(JSON.stringify(response)) : null;
         if (response) {
           res
@@ -104,6 +110,25 @@ module.exports = {
         }
       });
     } catch (error) {
+      res.status(500).json({ status: 0, message: error });
+    }
+  },
+  getKeysBatch: async (req, res) => {
+    //debugger;
+    try {
+      getKeysBatch(async (error, response) => {
+        //debugger;
+        response = response ? JSON.parse(JSON.stringify(response)) : null;
+        if (response) {
+          res
+            .status(200)
+            .json({ status: 1, message: "success", data: response });
+        } else {
+          res.status(500).json({ status: 0, message: error });
+        }
+      });
+    } catch (error) {
+      //debugger;
       res.status(500).json({ status: 0, message: error });
     }
   },
@@ -183,7 +208,7 @@ module.exports = {
     let { body = {} } = req;
     let { centerAds = [] } = req.files;
     var baseUrl = `${req.protocol}://${req.get("host")}`;
-    // //debugger;
+    // //////debugger;
     try {
       postCenterAds(body, centerAds, baseUrl, async (error, response) => {
         response = response ? JSON.parse(JSON.stringify(response)) : null;
@@ -351,7 +376,7 @@ module.exports = {
     }
   },
   uploadDataSheet: async (req, res) => {
-    debugger;
+    ////debugger;
     const file = req.files["file"][0];
 
     try {
@@ -369,7 +394,7 @@ module.exports = {
           sheets.map(async (sheet) => {
             switch (sheet) {
               case "CROSSREFERENCE":
-                debugger;
+                ////debugger;
                 let rows = reader.utils.sheet_to_json(
                   excelFile.Sheets["CROSSREFERENCE"],
                   { defval: "" }
@@ -379,7 +404,7 @@ module.exports = {
                 if (ress) successMessage.push("Cross Ref. Uploaded");
                 break;
               case "STOCKIST":
-                debugger;
+                ////debugger;
                 let rows1 = reader.utils.sheet_to_json(
                   excelFile.Sheets["STOCKIST"],
                   { defval: "", blankrows: false, skipHidden: true }
@@ -389,7 +414,7 @@ module.exports = {
                 if (ress1) successMessage.push("Stockiests Uploaded");
                 break;
               case "CHEMISTS_DRUGGISTS":
-                debugger;
+                ////debugger;
                 let rows2 = reader.utils.sheet_to_json(
                   excelFile.Sheets["CHEMISTS_DRUGGISTS"],
                   { defval: "", blankrows: false, skipHidden: true }
@@ -404,7 +429,7 @@ module.exports = {
             }
           })
         );
-        debugger;
+        ////debugger;
         res.status(200).json({
           status: 1,
           message: successMessage.join(" | "),
@@ -417,6 +442,53 @@ module.exports = {
           data: null,
         });
       }
+    } catch (error) {
+      res.status(500).json({ status: 0, message: error });
+    }
+  },
+
+  generateKeysBatch: async (req, res) => {
+    try {
+      let batch_id = Math.floor(Math.random() * 100000000 + 1);
+      addKeysBatch(req.body, batch_id, async (error, response) => {
+        debugger;
+        response = response ? JSON.parse(JSON.stringify(response)) : null;
+        if (response) {
+          generateLicences(
+            req.body.number_of_keys,
+            batch_id,
+            async (error, response) => {
+              debugger;
+              response = response ? JSON.parse(JSON.stringify(response)) : null;
+              if (response) {
+                res
+                  .status(200)
+                  .json({ status: 1, message: "success", data: response });
+              } else {
+                res.status(500).json({ status: 0, message: error });
+              }
+            }
+          );
+        } else {
+          res.status(500).json({ status: 0, message: error });
+        }
+      });
+    } catch (error) {
+      res.status(500).json({ status: 0, message: error });
+    }
+  },
+  deleteBatch: async (req, res) => {
+    try {
+      deleteBatch(req.params.id, async (error, response) => {
+        response = response ? JSON.parse(JSON.stringify(response)) : null;
+        if (response) {
+          res
+            .status(200)
+            .json({ status: 1, message: "success", data: response });
+        } else {
+          res.status(500).json({ status: 0, message: error });
+        }
+      });
     } catch (error) {
       res.status(500).json({ status: 0, message: error });
     }

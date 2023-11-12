@@ -17,6 +17,9 @@ const {
   deleteCenter,
   postCenterAds,
   uploadDataSheet,
+  getKeysBatch,
+  generateKeysBatch,
+  deleteBatch,
 } = require("./admin.controller");
 
 const router = require("express").Router();
@@ -65,6 +68,10 @@ const uploadCrossRef = multer({ storage: multerCrossRef });
 router.post("/login", login);
 router.get("/users", verifyToken, getUsers);
 router.get("/keys", verifyToken, getKeys);
+router.get("/keys/:id", verifyToken, getKeys);
+router.get("/keys-batch", verifyToken, getKeysBatch);
+router.post("/keys-batch", verifyToken, generateKeysBatch);
+router.delete("/keys-batch/:id", verifyToken, deleteBatch);
 router.get("/news", verifyToken, getNews);
 router.post(
   "/news/add",

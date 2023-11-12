@@ -87,13 +87,34 @@ module.exports = {
       return callback(null, results || null);
     });
   },
-  getKeys: (callback) => {
-    db.query(`select * from valid_keys`, [], (error, results, fields) => {
-      if (error) {
-        callback(error);
+  getKeys: (id, callback) => {
+    var where = "";
+    if (id) {
+      where = ` WHERE batch_id='${id} '`;
+    }
+    db.query(
+      `select * from valid_keys ${where}`,
+      [],
+      (error, results, fields) => {
+        if (error) {
+          callback(error);
+        }
+        return callback(null, results || null);
       }
-      return callback(null, results || null);
-    });
+    );
+  },
+  getKeysBatch: (callback) => {
+    db.query(
+      `select kb.*,sum(CASE WHEN vk.is_used=0 THEN 1 ELSE 0 END) as not_used_count,sum(vk.is_used) as used_count from keys_batch kb LEFT OUTER JOIN valid_keys vk ON kb.batch_id=vk.batch_id GROUP BY kb.batch_id ORDER BY kb.created DESC`,
+      [],
+      (error, results, fields) => {
+        // debugger;
+        if (error) {
+          callback(error);
+        }
+        return callback(null, results || null);
+      }
+    );
   },
   getNews: (callback) => {
     db.query(
@@ -341,4 +362,54 @@ module.exports = {
         }
       });
     }),
+
+  generateLicences: (count, batch_id, callback) => {
+    const licenseGen = require("@mcnaveen/license-gen");
+    // const { count = 0 } = params;
+    const errors = [];
+    let rowCount = 0;
+    for (var i = 0; i < count; i++) {
+      const key = licenseGen(16);
+      db.query(
+        `insert into valid_keys(reg_key,batch_id) values(?,?)`,
+        [key, batch_id],
+        (error, results, fields) => {
+          if (error) {
+            errors.push(error);
+          } else {
+            rowCount += 1;
+          }
+        }
+      );
+    }
+    if (errors.length) {
+      callback(errors[0]);
+    } else {
+      callback(null, { affectedRows: rowCount });
+    }
+  },
+  addKeysBatch: (data, batch_id, callback) => {
+    db.query(
+      `insert into keys_batch(batch_id,batch_name,printed_status) values(?,?,?)`,
+      [batch_id, data.batch_name, data.printed_status],
+      (error, results, fields) => {
+        if (error) {
+          callback(error);
+        }
+        return callback(null, results);
+      }
+    );
+  },
+  deleteBatch: (id, callback) => {
+    db.query(
+      `delete from keys_batch where id=?`,
+      [id],
+      (error, results, fields) => {
+        if (error) {
+          callback(error);
+        }
+        return callback(null, results || null);
+      }
+    );
+  },
 };
