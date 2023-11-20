@@ -20,6 +20,7 @@ const {
   getKeysBatch,
   generateKeysBatch,
   deleteBatch,
+  uploadPIS,
 } = require("./admin.controller");
 
 const router = require("express").Router();
@@ -64,6 +65,16 @@ const multerCrossRef = multer.diskStorage({
   },
 });
 const uploadCrossRef = multer({ storage: multerCrossRef });
+const multerUploadPIS = multer.diskStorage({
+  destination: (req, file, cb) => {
+    cb(null, "uploads/pis");
+  },
+  filename: (req, file, cb) => {
+    const ext = file.originalname.split(".").slice(-1);
+    cb(null, `${file.fieldname}-${Date.now()}.${ext}`);
+  },
+});
+const uploadUploadPIS = multer({ storage: multerUploadPIS });
 
 router.post("/login", login);
 router.get("/users", verifyToken, getUsers);
@@ -116,6 +127,12 @@ router.post(
   // verifyToken,
   uploadCrossRef.fields([{ name: "file", maxCount: 100 }]),
   uploadDataSheet
+);
+router.post(
+  "/upload-pis",
+  // verifyToken,
+  uploadUploadPIS.fields([{ name: "file", maxCount: 100 }]),
+  uploadPIS
 );
 
 module.exports = router;

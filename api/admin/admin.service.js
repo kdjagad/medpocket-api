@@ -24,7 +24,7 @@ async function checkDuplicate(row, table) {
     );
   });
 }
-function insertRows(rows, table) {
+function insertRows(rows, table, isIgnore = false) {
   return new Promise((resolve, reject) => {
     //debugger;
     const keys = Object.keys(rows[0]);
@@ -47,10 +47,36 @@ function insertRows(rows, table) {
   });
 }
 
+function insertRowsPIS(rows, table) {
+  return new Promise(async (resolve, reject) => {
+    const keys = Object.keys(rows[0]);
+    var vals = [];
+    await Promise.all(
+      rows.map((row) => {
+        var values = Object.values(row);
+        values = values.map((val) =>
+          val != "" && val ? `'${addslashes(val)}'` : "NULL"
+        );
+        console.log(`vals (${values.join(",")})`);
+        vals.push(`(${values.join(",")})`);
+      })
+    );
+    if (vals.length)
+      db.query(
+        `insert ignore into ${table}(${keys.join(",")}) values ${vals.join(
+          ","
+        )}`,
+        [],
+        (error, results, fields) => {
+          if (error) reject(error);
+          resolve(results);
+        }
+      );
+    else resolve(null);
+  });
+}
+
 function addslashes(string) {
-  // string = string.toString();
-  // console.log("string --- ", string);
-  // debugger;
   if (typeof string === "string" || string instanceof String)
     return string
       .replace(/\\/g, "\\\\")
@@ -361,6 +387,11 @@ module.exports = {
           resolve(true);
         }
       });
+    }),
+  uploadPISData: (data, table) =>
+    new Promise(async (resolve, reject) => {
+      await insertRowsPIS(data, table);
+      resolve(true);
     }),
 
   generateLicences: (count, batch_id, callback) => {
