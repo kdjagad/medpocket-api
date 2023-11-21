@@ -1,4 +1,14 @@
-require("dotenv").config();
+const dotenv = require("dotenv");
+
+// Load environment-specific configuration
+if (process.env.NODE_ENV === "development") {
+  dotenv.config({ path: ".env.development" });
+} else if (process.env.NODE_ENV === "production") {
+  dotenv.config({ path: ".env.production" });
+} else if (process.env.NODE_ENV === "test") {
+  dotenv.config({ path: ".env.test" });
+}
+
 const express = require("express");
 var bodyParser = require("body-parser");
 const cors = require("cors");
