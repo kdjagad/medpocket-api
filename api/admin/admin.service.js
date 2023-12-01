@@ -1,5 +1,6 @@
 const FCM = require("fcm-node");
 const db = require("../../config/db.config");
+const { map, omit } = require("lodash");
 
 function cleanUrl(url) {
   return url.replace(/\\/g, "/");
@@ -267,11 +268,32 @@ module.exports = {
     db.query(
       `select * from users where id=?`,
       [id],
-      (error, results, fields) => {
+      async (error, results, fields) => {
         if (error) {
           callback(error);
+        } else {
+          db.query(
+            "select * from uploaded_stockiests where user_id=?",
+            [id],
+            (err, sotckiestRes) => {
+              db.query(
+                "select * from uploaded_products where user_id=?",
+                [id],
+                (err1, productsRes) => {
+                  // debugger;
+                  var result = null;
+                  if (results.length)
+                    result = {
+                      ...results[0],
+                      uploaded_stockiests: sotckiestRes || [],
+                      uploaded_products: productsRes || [],
+                    };
+                  return callback(null, result || null);
+                }
+              );
+            }
+          );
         }
-        return callback(null, results.length ? results[0] : null);
       }
     );
   },
@@ -370,20 +392,22 @@ module.exports = {
         if (error) {
           reject(error);
         } else {
-          var length = data.length || 0;
-          var rowsAffected = 0;
-          var parts = [];
-          var count = 10000;
-          var pages = Math.floor(length / count);
-          for (var i = 0; i <= pages; i++) {
-            var partArray = data.slice(i * 100, i * 100 + count);
-            parts.push(partArray);
-          }
-          await Promise.all(
-            parts.map(async (partData) => {
-              if (partData.length) await insertRows(partData, table);
-            })
-          );
+          // var length = data.length || 0;
+          // var rowsAffected = 0;
+          // var parts = [];
+          // var count = 10000;
+          // var pages = Math.floor(length / count);
+          // for (var i = 0; i <= pages; i++) {
+          //   var partArray = data.slice(i * 100, i * 100 + count);
+          //   parts.push(partArray);
+          // }
+          // await Promise.all(
+          // parts.map(async (partData) => {
+          //     if (partData.length)
+          // })
+          //   );
+          await insertRows(data, table);
+          debugger;
           resolve(true);
         }
       });
@@ -393,7 +417,34 @@ module.exports = {
       await insertRowsPIS(data, table);
       resolve(true);
     }),
+  downloadData: (workbook, worksheetName, table, excludeColumn) =>
+    new Promise(async (resolve, reject) => {
+      db.query(`select * from ${table}`, [], async (error, results, fields) => {
+        if (error) {
+          reject(error);
+        } else {
+          // debugger;
+          let worksheet = workbook.addWorksheet(worksheetName);
 
+          const newArr = results.map((dt) => {
+            delete dt[excludeColumn];
+            return dt;
+          });
+
+          worksheet.columns = Object.keys(newArr[0]).map((dt) => {
+            return {
+              header: dt,
+              key: dt,
+            };
+          });
+
+          // Add Array Rows
+          worksheet.addRows(results);
+
+          resolve(workbook);
+        }
+      });
+    }),
   generateLicences: (count, batch_id, callback) => {
     const licenseGen = require("@mcnaveen/license-gen");
     // const { count = 0 } = params;

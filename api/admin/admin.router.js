@@ -21,6 +21,8 @@ const {
   generateKeysBatch,
   deleteBatch,
   uploadPIS,
+  downloadDataSheet,
+  downloadDataSheetPIS,
 } = require("./admin.controller");
 
 const router = require("express").Router();
@@ -127,6 +129,16 @@ router.post(
   // verifyToken,
   uploadCrossRef.fields([{ name: "file", maxCount: 100 }]),
   uploadDataSheet
+);
+router.get(
+  "/download-data",
+  // verifyToken,
+  downloadDataSheet
+);
+router.get(
+  "/download-pis-data",
+  // verifyToken,
+  downloadDataSheetPIS
 );
 router.post(
   "/upload-pis",

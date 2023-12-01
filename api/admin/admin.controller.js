@@ -22,10 +22,12 @@ const {
   generateLicences,
   deleteBatch,
   uploadPISData,
+  downloadData,
 } = require("./admin.service");
 
 require("dotenv").config();
 const jwt = require("jsonwebtoken");
+const excel = require("exceljs");
 var CryptoJS = require("crypto-js");
 // const readXlsxFile = require("read-excel-file/node");
 const reader = require("xlsx");
@@ -359,11 +361,11 @@ module.exports = {
                 body.messageHeader,
                 body.messageDetail,
                 async (er, response) => {
-                  if (er) res.status(500).json({ status: 0, message: er });
-                  else
-                    res
-                      .status(200)
-                      .json({ status: 1, message: "success", data: null });
+                  // if (er) res.status(500).json({ status: 0, message: er });
+                  // else
+                  res
+                    .status(200)
+                    .json({ status: 1, message: "success", data: null });
                 }
               );
             } else {
@@ -489,6 +491,59 @@ module.exports = {
           data: null,
         });
       }
+    } catch (error) {
+      res.status(500).json({ status: 0, message: error });
+    }
+  },
+
+  downloadDataSheet: async (req, res) => {
+    try {
+      let workbook = new excel.Workbook();
+
+      await downloadData(workbook, "CROSSREFERENCE", "crossreference", "id");
+      await downloadData(workbook, "STOCKIST", "stockiests", "id");
+      await downloadData(
+        workbook,
+        "CHEMISTS_DRUGGISTS",
+        "chemistsdruggiest",
+        "ID"
+      );
+      // res is a Stream object
+      res.setHeader(
+        "Content-Type",
+        "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet"
+      );
+      res.setHeader(
+        "Content-Disposition",
+        "attachment; filename=" + `data_sheet_${new Date()}.xlsx`
+      );
+
+      return workbook.xlsx.write(res).then(function () {
+        res.status(200).end();
+      });
+    } catch (error) {
+      res.status(500).json({ status: 0, message: error });
+    }
+  },
+  downloadDataSheetPIS: async (req, res) => {
+    try {
+      let workbook = new excel.Workbook();
+
+      await downloadData(workbook, "PIS", "products", "ID");
+
+      // res is a Stream object
+      res.setHeader(
+        "Content-Type",
+        "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet"
+      );
+      res.setHeader(
+        "Content-Disposition",
+        "attachment; filename=" + `data_pis_${new Date()}.xlsx`
+      );
+
+      return workbook.xlsx.write(res).then(function () {
+        res.status(200).end();
+      });
     } catch (error) {
       res.status(500).json({ status: 0, message: error });
     }
