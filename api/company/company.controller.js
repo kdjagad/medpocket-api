@@ -139,19 +139,23 @@ module.exports = {
   },
   getStockiestDetails: async (req, res) => {
     try {
-      getStockiestDetails(req.body.stockiest, async (error, response) => {
-        response = response ? JSON.parse(JSON.stringify(response)) : null;
-        if (response) {
-          res.status(200).json({
-            status: 1,
-            message: "success",
-            // data: response,
-            data: response.length ? response[0] : null,
-          });
-        } else {
-          res.status(500).json({ status: 0, message: error });
+      getStockiestDetails(
+        req.body.stockiest,
+        req.body.center || "",
+        async (error, response) => {
+          response = response ? JSON.parse(JSON.stringify(response)) : null;
+          if (response) {
+            res.status(200).json({
+              status: 1,
+              message: "success",
+              // data: response,
+              data: response.length ? response[0] : null,
+            });
+          } else {
+            res.status(500).json({ status: 0, message: error });
+          }
         }
-      });
+      );
     } catch (error) {
       res.status(500).json({ status: 0, message: error });
     }

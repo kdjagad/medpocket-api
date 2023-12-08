@@ -107,9 +107,12 @@ module.exports = {
       return callback(null, results || null);
     });
   },
-  getStockiestDetails: (stockiest, callback) => {
+  getStockiestDetails: (stockiest, center, callback) => {
     //
-    var queryString = `select * from stockiests where REPLACE(firm_name," ","")=REPLACE(?," ","")`;
+    const where = "";
+    if (center) where = ` AND CENTER='${center}' `;
+
+    var queryString = `select * from stockiests where REPLACE(firm_name," ","")=REPLACE(?," ","") ${where}`;
     // var queryString = `select * from stockiests where firm_name LIKE CONCAT(SUBSTRING_INDEX(?,'-',1),'%')`;
 
     db.query(queryString, [stockiest], (error, results, fields) => {
@@ -121,7 +124,7 @@ module.exports = {
       if (results.length) {
         return callback(null, results || null);
       } else {
-        var queryString1 = `select * from chemistsdruggiest where REPLACE(firm_name," ","")=REPLACE(?," ","")`;
+        var queryString1 = `select * from chemistsdruggiest where REPLACE(firm_name," ","")=REPLACE(?," ","") ${where}`;
         // var queryString1 = `select * from chemistsdruggiest where firm_name LIKE CONCAT(SUBSTRING_INDEX(?,'-',1),'%')`;
         db.query(queryString1, [stockiest], (error, results, fields) => {
           // debugger;
