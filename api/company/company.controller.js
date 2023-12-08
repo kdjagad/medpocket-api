@@ -141,7 +141,7 @@ module.exports = {
     try {
       getStockiestDetails(
         req.body.stockiest,
-        req.user.city || req.body.center || null,
+        req.user ? req.user.city : req.body.city,
         async (error, response) => {
           response = response ? JSON.parse(JSON.stringify(response)) : null;
           if (response) {
